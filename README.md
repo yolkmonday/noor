@@ -20,12 +20,23 @@ Aplikasi waktu solat untuk macOS. Tampil di menu bar dengan hitung mundur, notif
 ```bash
 brew tap yolkmonday/noor
 brew install --cask noor
-xattr -rd com.apple.quarantine /Applications/Noor.app
 ```
 
 ### Manual
 
 Download DMG dari [Releases](https://github.com/yolkmonday/noor/releases), buka, lalu seret Noor ke folder Applications.
+
+## Troubleshooting
+
+### "Noor.app" Not Opened - Apple could not verify
+
+Jika muncul peringatan **"Apple could not verify Noor.app is free of malware"**, jalankan perintah ini di Terminal:
+
+```bash
+xattr -cr /Applications/Noor.app
+```
+
+Lalu buka kembali Noor. Peringatan ini muncul karena app belum di-notarize oleh Apple, bukan karena ada masalah keamanan.
 
 ## Persyaratan
 
