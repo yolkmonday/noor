@@ -20,6 +20,7 @@ Aplikasi waktu solat untuk macOS. Tampil di menu bar dengan hitung mundur, notif
 ```bash
 brew tap yolkmonday/noor
 brew install --cask noor
+xattr -rd com.apple.quarantine /Applications/Noor.app
 ```
 
 ### Manual
