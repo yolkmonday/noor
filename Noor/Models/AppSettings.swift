@@ -15,6 +15,14 @@ enum PrayerNotificationMode: String, CaseIterable, Codable {
         }
     }
 
+    var label: String {
+        switch self {
+        case .off: return "Mute"
+        case .silent: return "Silent"
+        case .azan: return "Azan"
+        }
+    }
+
     func next() -> PrayerNotificationMode {
         switch self {
         case .off: return .silent

@@ -43,14 +43,20 @@ final class NotificationService {
     @MainActor
     func schedulePrayerNotification(
         prayer: String,
-        time: Date
+        time: Date,
+        playAzan: Bool = false
     ) {
         // Skip if time is in the past
         guard time > Date() else { return }
 
-        // Get azan settings
-        let azanService = AzanService.shared
-        let playAzan = azanService.azanEnabled && azanService.selectedAzanId != "silent"
+        // Check if azan file is available when playAzan requested
+        let shouldPlayAzan: Bool
+        if playAzan {
+            let azanService = AzanService.shared
+            shouldPlayAzan = azanService.selectedAzanId != "silent" && azanService.isDownloaded(azanService.selectedAzanId)
+        } else {
+            shouldPlayAzan = false
+        }
 
         // Notification at exact time
         scheduleAt(
@@ -58,7 +64,7 @@ final class NotificationService {
             title: "Waktu \(prayer) Telah Tiba",
             body: "Saatnya menunaikan solat \(prayer)",
             date: time,
-            playAzan: playAzan
+            playAzan: shouldPlayAzan
         )
 
         // Reminder before prayer time (if enabled)

@@ -32,14 +32,18 @@ struct PrayerRowView: View {
                 Button {
                     settings.toggleNotificationMode(for: prayer)
                 } label: {
-                    Image(systemName: notificationIcon)
-                        .font(.system(size: 14))
-                        .foregroundStyle(notificationColor)
-                        .frame(width: 24)
+                    HStack(spacing: 4) {
+                        Image(systemName: notificationIcon)
+                            .font(.system(size: 12))
+                        Text(notificationLabel)
+                            .font(.system(size: 10))
+                    }
+                    .foregroundStyle(notificationColor)
+                    .frame(width: 60)
                 }
                 .buttonStyle(.plain)
             } else {
-                Color.clear.frame(width: 24)
+                Color.clear.frame(width: 60)
             }
         }
         .padding(.vertical, 10)
@@ -66,6 +70,10 @@ struct PrayerRowView: View {
 
     private var notificationIcon: String {
         settings.notificationMode(for: prayer).icon
+    }
+
+    private var notificationLabel: String {
+        settings.notificationMode(for: prayer).label
     }
 
     private var notificationColor: Color {

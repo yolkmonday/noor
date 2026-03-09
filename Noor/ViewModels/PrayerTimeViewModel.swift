@@ -68,6 +68,14 @@ final class PrayerTimeViewModel: ObservableObject {
             self?.updateCountdown()
         }
         .store(in: &cancellables)
+
+        // Re-schedule notifications when per-prayer settings change
+        settings.$prayerNotifications
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.scheduleNotifications()
+            }
+            .store(in: &cancellables)
     }
 
     private func setupTimer() {
@@ -260,8 +268,15 @@ final class PrayerTimeViewModel: ObservableObject {
         ]
 
         for (prayer, name) in prayerList {
+            let mode = settings.notificationMode(for: prayer)
+            guard mode != .off else { continue }
+
             let time = prayers.time(for: prayer)
-            notificationService.schedulePrayerNotification(prayer: name, time: time)
+            notificationService.schedulePrayerNotification(
+                prayer: name,
+                time: time,
+                playAzan: mode == .azan
+            )
         }
     }
 
