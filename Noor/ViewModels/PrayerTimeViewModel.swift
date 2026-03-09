@@ -83,6 +83,9 @@ final class PrayerTimeViewModel: ObservableObject {
             .sink { [weak self] _ in
                 Task { @MainActor in
                     guard let self else { return }
+                    // Restart timer karena Timer bisa mati setelah sleep
+                    self.timer?.invalidate()
+                    self.setupTimer()
                     self.recalculate(lat: self.locationService.latitude, lng: self.locationService.longitude)
                 }
             }
