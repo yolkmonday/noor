@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import Combine
+import os.log
 
 enum AzanDownloadState {
     case notDownloaded
@@ -12,6 +13,8 @@ enum AzanDownloadState {
 @MainActor
 final class AzanService: ObservableObject {
     static let shared = AzanService()
+    private static let logger = Logger(subsystem: "com.noor.app", category: "AzanService")
+    private static let downloadTimeoutSeconds: TimeInterval = 60
 
     @Published var downloadStates: [String: AzanDownloadState] = [:]
     @Published var selectedAzanId: String {
@@ -28,6 +31,13 @@ final class AzanService: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
 
+    private lazy var downloadSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = Self.downloadTimeoutSeconds
+        config.timeoutIntervalForResource = Self.downloadTimeoutSeconds * 2
+        return URLSession(configuration: config)
+    }()
+
     private init() {
         selectedAzanId = UserDefaults.standard.string(forKey: "selectedAzanId") ?? "silent"
         azanEnabled = UserDefaults.standard.bool(forKey: "azanEnabled")
@@ -39,7 +49,9 @@ final class AzanService: ObservableObject {
     // MARK: - Directory Management
 
     private var azanDirectory: URL {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            fatalError("Application Support directory not available")
+        }
         let dir = appSupport.appendingPathComponent("Noor/azan", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
@@ -83,7 +95,7 @@ final class AzanService: ObservableObject {
         downloadStates[option.id] = .downloading(progress: 0)
 
         do {
-            let (tempURL, _) = try await URLSession.shared.download(from: url)
+            let (tempURL, _) = try await downloadSession.download(from: url)
             let localPath = localURL(for: option.id)
 
             // Remove existing if any
@@ -93,8 +105,10 @@ final class AzanService: ObservableObject {
             try FileManager.default.moveItem(at: tempURL, to: localPath)
 
             downloadStates[option.id] = .downloaded
+            Self.logger.info("Azan downloaded: \(option.id)")
         } catch {
             downloadStates[option.id] = .failed(error)
+            Self.logger.error("Failed to download azan \(option.id): \(error.localizedDescription)")
         }
     }
 
@@ -131,7 +145,7 @@ final class AzanService: ObservableObject {
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
         } catch {
-            print("Failed to play azan: \(error)")
+            Self.logger.error("Failed to play azan: \(error.localizedDescription)")
         }
     }
 

@@ -1,4 +1,5 @@
 import Foundation
+import os.log
 
 struct PrayerStats {
     let totalDays: Int
@@ -36,7 +37,7 @@ final class StatsService {
         }
 
         // Calculate days in range
-        let dayCount = calendar.dateComponents([.day], from: startDate, to: endDate).day! + 1
+        let dayCount = (calendar.dateComponents([.day], from: startDate, to: endDate).day ?? 0) + 1
 
         // Count completed days (all 5 wajib prayers)
         var completedDays = 0
@@ -68,18 +69,19 @@ final class StatsService {
                 completedDays += 1
             }
 
-            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+            guard let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate) else { break }
+            currentDate = nextDate
         }
 
         // Calculate streaks
         let (currentStreak, bestStreak) = calculateStreaks(upTo: endDate)
 
         // Weekly percentage (last 7 days)
-        let weekAgo = calendar.date(byAdding: .day, value: -6, to: endDate)!
+        let weekAgo = calendar.date(byAdding: .day, value: -6, to: endDate) ?? endDate
         let weeklyStats = calculatePercentage(from: weekAgo, to: endDate)
 
         // Monthly percentage (last 30 days)
-        let monthAgo = calendar.date(byAdding: .day, value: -29, to: endDate)!
+        let monthAgo = calendar.date(byAdding: .day, value: -29, to: endDate) ?? endDate
         let monthlyStats = calculatePercentage(from: monthAgo, to: endDate)
 
         return PrayerStats(
@@ -101,7 +103,7 @@ final class StatsService {
         let calendar = Calendar.current
 
         // Go back up to 365 days to find streaks
-        let startDate = calendar.date(byAdding: .day, value: -365, to: endDate)!
+        guard let startDate = calendar.date(byAdding: .day, value: -365, to: endDate) else { return (0, 0) }
         let logs = logService.fetchLogs(from: startDate, to: endDate)
 
         // Group completed wajib prayers by date
@@ -130,12 +132,14 @@ final class StatsService {
 
         // Check if today is completed, if not start from yesterday
         if !fullyCompletedDays.contains(checkDate) {
-            checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+            guard let yesterday = calendar.date(byAdding: .day, value: -1, to: checkDate) else { return (0, 0) }
+            checkDate = yesterday
         }
 
         while fullyCompletedDays.contains(checkDate) {
             currentStreak += 1
-            checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+            guard let prevDay = calendar.date(byAdding: .day, value: -1, to: checkDate) else { break }
+            checkDate = prevDay
         }
 
         // Calculate best streak
@@ -148,7 +152,7 @@ final class StatsService {
                 tempStreak = 1
             } else {
                 let prevDate = sortedDates[index - 1]
-                let dayDiff = calendar.dateComponents([.day], from: prevDate, to: date).day!
+                let dayDiff = calendar.dateComponents([.day], from: prevDate, to: date).day ?? 0
 
                 if dayDiff == 1 {
                     tempStreak += 1
@@ -167,7 +171,7 @@ final class StatsService {
 
     func calculatePercentage(from startDate: Date, to endDate: Date) -> Double {
         let calendar = Calendar.current
-        let dayCount = calendar.dateComponents([.day], from: startDate, to: endDate).day! + 1
+        let dayCount = (calendar.dateComponents([.day], from: startDate, to: endDate).day ?? 0) + 1
         let totalPossible = dayCount * 5
 
         if totalPossible == 0 { return 0 }
@@ -194,7 +198,7 @@ final class StatsService {
         let weekStart = calendar.date(from: components) ?? Date()
         let today = Date()
 
-        let daysPassed = calendar.dateComponents([.day], from: weekStart, to: today).day! + 1
+        let daysPassed = (calendar.dateComponents([.day], from: weekStart, to: today).day ?? 0) + 1
         let totalPossible = daysPassed * 5
 
         let logs = logService.fetchLogs(from: weekStart, to: today)

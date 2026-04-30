@@ -1,6 +1,7 @@
 import Foundation
 import ServiceManagement
 import Adhan
+import os.log
 
 enum PrayerNotificationMode: String, CaseIterable, Codable {
     case off = "off"           // Tidak ada notifikasi
@@ -82,6 +83,7 @@ enum PrayerNameFormat: String, CaseIterable, Codable {
 
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
+    private static let logger = Logger(subsystem: "com.noor.app", category: "AppSettings")
 
     @Published var menuBarDisplayMode: MenuBarDisplayMode {
         didSet { save() }
@@ -247,7 +249,7 @@ final class AppSettings: ObservableObject {
                     try SMAppService.mainApp.unregister()
                 }
             } catch {
-                print("Failed to update launch at login: \(error)")
+                Self.logger.error("Failed to update launch at login: \(error.localizedDescription)")
             }
         }
     }

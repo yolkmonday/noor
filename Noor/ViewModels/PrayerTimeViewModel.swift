@@ -2,9 +2,14 @@ import SwiftUI
 import Combine
 import Adhan
 import AppKit
+import os.log
 
 @MainActor
 final class PrayerTimeViewModel: ObservableObject {
+
+    // MARK: - Constants
+    private static let logger = Logger(subsystem: "com.noor.app", category: "PrayerTimeViewModel")
+    private static let approachingThresholdSeconds: TimeInterval = 15 * 60  // 15 minutes
 
     // MARK: - Published State
     @Published var prayerTimes: PrayerTimes?
@@ -28,8 +33,9 @@ final class PrayerTimeViewModel: ObservableObject {
     private let notificationService = NotificationService.shared
     private let settings = AppSettings.shared
 
-    nonisolated(unsafe) private var timer: Timer?
+    private var timer: Timer?
     private var cancellables = Set<AnyCancellable>()
+    private var prayerTimesDay: Date?
 
     // MARK: - Lifecycle
     init() {
@@ -120,12 +126,20 @@ final class PrayerTimeViewModel: ObservableObject {
     // MARK: - Calculations
     private func recalculate(lat: Double, lng: Double) {
         prayerTimes = adhanService.getPrayerTimes(latitude: lat, longitude: lng)
+        prayerTimesDay = Calendar.current.startOfDay(for: Date())
         updateCountdown()
         scheduleNotifications()
     }
 
     private func updateCountdown() {
         currentDate = Date()
+
+        // Refresh prayer times when day rolls over (e.g. machine awake past midnight)
+        let today = Calendar.current.startOfDay(for: currentDate)
+        if let day = prayerTimesDay, day != today {
+            recalculate(lat: locationService.latitude, lng: locationService.longitude)
+            return
+        }
 
         guard let prayers = prayerTimes else {
             menuBarLabel = "Noor"
@@ -143,13 +157,12 @@ final class PrayerTimeViewModel: ObservableObject {
         } else {
             // Setelah Isya, hitung Subuh besok
             next = .fajr
-            let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-            let tomorrowPrayers = adhanService.getPrayerTimes(
-                latitude: locationService.latitude,
-                longitude: locationService.longitude,
-                date: tomorrow
-            )
-            guard let tomorrowPrayers = tomorrowPrayers else {
+            guard let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()),
+                  let tomorrowPrayers = adhanService.getPrayerTimes(
+                      latitude: locationService.latitude,
+                      longitude: locationService.longitude,
+                      date: tomorrow
+                  ) else {
                 menuBarLabel = "Noor"
                 countdownText = "--:--:--"
                 return
@@ -173,7 +186,7 @@ final class PrayerTimeViewModel: ObservableObject {
         let s = Int(diff) % 60
 
         // Check if approaching (15 minutes or less)
-        isApproaching = diff <= 15 * 60
+        isApproaching = diff <= Self.approachingThresholdSeconds
 
         // Calculate remaining time in current prayer (time since last prayer started)
         remainingInCurrentPrayer = calculateRemainingInCurrentPrayer(prayers: prayers, nextPrayer: next)
@@ -343,7 +356,7 @@ final class PrayerTimeViewModel: ObservableObject {
     }
 
     func currentPrayerName() -> String? {
-        guard let prayers = prayerTimes,
+        guard prayerTimes != nil,
               let next = nextPrayer else { return nil }
 
         let prayerOrder: [Prayer] = [.fajr, .sunrise, .dhuhr, .asr, .maghrib, .isha]

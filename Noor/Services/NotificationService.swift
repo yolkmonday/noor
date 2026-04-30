@@ -1,10 +1,12 @@
 import Foundation
 import UserNotifications
 import AVFoundation
+import os.log
 
 final class NotificationService {
 
     static let shared = NotificationService()
+    private static let logger = Logger(subsystem: "com.noor.app", category: "NotificationService")
 
     private let center = UNUserNotificationCenter.current()
     private var audioPlayer: AVAudioPlayer?
@@ -34,7 +36,7 @@ final class NotificationService {
                 options: [.alert, .sound, .badge]
             )
         } catch {
-            print("Notification permission error: \(error)")
+            Self.logger.error("Notification permission error: \(error.localizedDescription)")
             return false
         }
     }
@@ -114,7 +116,7 @@ final class NotificationService {
 
         center.add(request) { error in
             if let error {
-                print("Failed to schedule notification: \(error)")
+                Self.logger.error("Failed to schedule notification: \(error.localizedDescription)")
             }
         }
     }

@@ -1,7 +1,9 @@
 import CoreData
+import os.log
 
 final class PersistenceController {
     static let shared = PersistenceController()
+    private static let logger = Logger(subsystem: "com.noor.app", category: "PersistenceController")
 
     let container: NSPersistentContainer
 
@@ -26,7 +28,7 @@ final class PersistenceController {
 
         container.loadPersistentStores { description, error in
             if let error = error {
-                print("Core Data failed to load: \(error.localizedDescription)")
+                Self.logger.error("Core Data failed to load: \(error.localizedDescription)")
             }
         }
 
@@ -35,7 +37,9 @@ final class PersistenceController {
     }
 
     private static func storeURL() -> URL {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            fatalError("Application Support directory not available")
+        }
         let noorDir = appSupport.appendingPathComponent("Noor", isDirectory: true)
 
         // Create directory if needed
@@ -50,7 +54,7 @@ final class PersistenceController {
             do {
                 try context.save()
             } catch {
-                print("Failed to save context: \(error.localizedDescription)")
+                Self.logger.error("Failed to save context: \(error.localizedDescription)")
             }
         }
     }

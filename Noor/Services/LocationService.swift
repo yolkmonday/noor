@@ -1,9 +1,11 @@
 import Foundation
 import CoreLocation
+import os.log
 
 final class LocationService: NSObject, ObservableObject {
 
     static let shared = LocationService()
+    private static let logger = Logger(subsystem: "com.noor.app", category: "LocationService")
 
     @Published var selectedCity: City?
     @Published var latitude: Double
@@ -41,8 +43,8 @@ final class LocationService: NSObject, ObservableObject {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
 
-        print("🚀 LocationService init - isUsingGPS: \(isUsingGPS)")
-        print("🚀 Current auth status: \(CLLocationManager.authorizationStatus().rawValue)")
+        Self.logger.info("LocationService init - isUsingGPS: \(self.isUsingGPS)")
+        Self.logger.info("Current auth status: \(CLLocationManager.authorizationStatus().rawValue)")
 
         if isUsingGPS {
             requestLocation()
@@ -95,21 +97,20 @@ final class LocationService: NSObject, ObservableObject {
 
 extension LocationService: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        print("📍 Authorization status: \(manager.authorizationStatus.rawValue)")
+        Self.logger.info("Authorization status: \(manager.authorizationStatus.rawValue)")
         guard isUsingGPS else { return }
 
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
-            print("✅ Location authorized, requesting location...")
+            Self.logger.info("Location authorized, requesting location")
             manager.requestLocation()
         case .denied, .restricted:
-            print("❌ Location denied/restricted")
-            // Fall back to default city
+            Self.logger.warning("Location denied/restricted")
             cityName = CityData.shared.defaultCity.name
             latitude = CityData.shared.defaultCity.latitude
             longitude = CityData.shared.defaultCity.longitude
         case .notDetermined:
-            print("⏳ Location not determined, requesting authorization...")
+            Self.logger.info("Location not determined, requesting authorization")
             manager.requestWhenInUseAuthorization()
         @unknown default:
             break
@@ -122,9 +123,7 @@ extension LocationService: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("❌ Location error: \(error.localizedDescription)")
-        print("❌ Error code: \((error as NSError).code)")
-        // Use default on error
+        Self.logger.error("Location error: \(error.localizedDescription) (code: \((error as NSError).code))")
         if isUsingGPS {
             cityName = CityData.shared.defaultCity.name
             latitude = CityData.shared.defaultCity.latitude
