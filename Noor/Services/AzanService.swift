@@ -3,147 +3,70 @@ import AVFoundation
 import Combine
 import os.log
 
-enum AzanDownloadState {
-    case notDownloaded
-    case downloading(progress: Double)
-    case downloaded
-    case failed(Error)
-}
-
 @MainActor
-final class AzanService: ObservableObject {
+final class AzanService: NSObject, ObservableObject {
     static let shared = AzanService()
     private static let logger = Logger(subsystem: "com.noor.app", category: "AzanService")
-    private static let downloadTimeoutSeconds: TimeInterval = 60
 
-    @Published var downloadStates: [String: AzanDownloadState] = [:]
     @Published var selectedAzanId: String {
         didSet {
             UserDefaults.standard.set(selectedAzanId, forKey: "selectedAzanId")
         }
     }
-    @Published var azanEnabled: Bool {
-        didSet {
-            UserDefaults.standard.set(azanEnabled, forKey: "azanEnabled")
-        }
-    }
+
+    /// True while a full azan (not preview) is playing
+    @Published private(set) var isPlaying = false
+
+    /// Called when a full azan finishes playing on its own (not stopped manually)
+    var onFinishPlaying: (() -> Void)?
 
     private var audioPlayer: AVAudioPlayer?
-    private var downloadTasks: [String: URLSessionDownloadTask] = [:]
 
-    private lazy var downloadSession: URLSession = {
-        let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = Self.downloadTimeoutSeconds
-        config.timeoutIntervalForResource = Self.downloadTimeoutSeconds * 2
-        return URLSession(configuration: config)
-    }()
+    private override init() {
+        let saved = UserDefaults.standard.string(forKey: "selectedAzanId") ?? "silent"
+        selectedAzanId = saved
+        super.init()
 
-    private init() {
-        selectedAzanId = UserDefaults.standard.string(forKey: "selectedAzanId") ?? "silent"
-        azanEnabled = UserDefaults.standard.bool(forKey: "azanEnabled")
-
-        // Check which files are already downloaded
-        checkDownloadedFiles()
-    }
-
-    // MARK: - Directory Management
-
-    private var azanDirectory: URL {
-        guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            fatalError("Application Support directory not available")
-        }
-        let dir = appSupport.appendingPathComponent("Noor/azan", isDirectory: true)
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        return dir
-    }
-
-    private func localURL(for azanId: String) -> URL {
-        azanDirectory.appendingPathComponent("\(azanId).mp3")
-    }
-
-    // MARK: - Download State
-
-    func checkDownloadedFiles() {
-        for option in AzanOption.all {
-            if option.isSilent {
-                downloadStates[option.id] = .downloaded
-            } else {
-                let localPath = localURL(for: option.id)
-                if FileManager.default.fileExists(atPath: localPath.path) {
-                    downloadStates[option.id] = .downloaded
-                } else {
-                    downloadStates[option.id] = .notDownloaded
-                }
-            }
+        // Migrate away from an id that no longer has a bundled sound
+        // (e.g. leftover from the old remote-download azan list)
+        if saved != "silent" && !isAvailable(saved) {
+            let fallback = AzanOption.all.first(where: { !$0.isSilent && isAvailable($0.id) })?.id ?? "silent"
+            Self.logger.info("selectedAzanId '\(saved)' no longer bundled, migrating to '\(fallback)'")
+            selectedAzanId = fallback
         }
     }
 
-    func isDownloaded(_ azanId: String) -> Bool {
+    // MARK: - Bundled Resource
+
+    private func bundledURL(for azanId: String) -> URL? {
+        Bundle.main.url(forResource: azanId, withExtension: "mp3")
+    }
+
+    func isAvailable(_ azanId: String) -> Bool {
         if azanId == "silent" { return true }
-        if case .downloaded = downloadStates[azanId] {
-            return true
-        }
-        return false
-    }
-
-    // MARK: - Download
-
-    func download(_ option: AzanOption) async {
-        guard !option.isSilent else { return }
-        guard let url = URL(string: option.downloadURL) else { return }
-
-        downloadStates[option.id] = .downloading(progress: 0)
-
-        do {
-            let (tempURL, _) = try await downloadSession.download(from: url)
-            let localPath = localURL(for: option.id)
-
-            // Remove existing if any
-            try? FileManager.default.removeItem(at: localPath)
-
-            // Move downloaded file
-            try FileManager.default.moveItem(at: tempURL, to: localPath)
-
-            downloadStates[option.id] = .downloaded
-            Self.logger.info("Azan downloaded: \(option.id)")
-        } catch {
-            downloadStates[option.id] = .failed(error)
-            Self.logger.error("Failed to download azan \(option.id): \(error.localizedDescription)")
-        }
-    }
-
-    func cancelDownload(_ azanId: String) {
-        downloadTasks[azanId]?.cancel()
-        downloadTasks[azanId] = nil
-        downloadStates[azanId] = .notDownloaded
-    }
-
-    func deleteDownload(_ azanId: String) {
-        let localPath = localURL(for: azanId)
-        try? FileManager.default.removeItem(at: localPath)
-        downloadStates[azanId] = .notDownloaded
-
-        // Reset selection if deleted
-        if selectedAzanId == azanId {
-            selectedAzanId = "silent"
-        }
+        return bundledURL(for: azanId) != nil
     }
 
     // MARK: - Playback
 
+    /// Play the full azan track (used for actual prayer notifications)
     func play(_ azanId: String? = nil) {
         let id = azanId ?? selectedAzanId
         guard id != "silent" else { return }
-
-        let localPath = localURL(for: id)
-        guard FileManager.default.fileExists(atPath: localPath.path) else { return }
+        guard let url = bundledURL(for: id) else {
+            Self.logger.error("Azan resource not found in bundle: \(id)")
+            return
+        }
 
         do {
             audioPlayer?.stop()
             audioPlayer = nil
-            audioPlayer = try AVAudioPlayer(contentsOf: localPath)
-            audioPlayer?.prepareToPlay()
-            audioPlayer?.play()
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.delegate = self
+            player.prepareToPlay()
+            player.play()
+            audioPlayer = player
+            isPlaying = true
         } catch {
             Self.logger.error("Failed to play azan: \(error.localizedDescription)")
         }
@@ -152,26 +75,52 @@ final class AzanService: ObservableObject {
     func stop() {
         audioPlayer?.stop()
         audioPlayer = nil
+        isPlaying = false
     }
 
     func preview(_ azanId: String) {
-        // Play a few seconds for preview
-        play(azanId)
+        // Play a few seconds for preview only, doesn't affect isPlaying/popup state
+        guard azanId != "silent", let url = bundledURL(for: azanId) else { return }
 
-        // Stop after 5 seconds
+        do {
+            audioPlayer?.stop()
+            let previewPlayer = try AVAudioPlayer(contentsOf: url)
+            previewPlayer.delegate = nil
+            previewPlayer.prepareToPlay()
+            previewPlayer.play()
+            audioPlayer = previewPlayer
+        } catch {
+            Self.logger.error("Failed to preview azan: \(error.localizedDescription)")
+            return
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
-            self?.stop()
+            self?.audioPlayer?.stop()
+            self?.audioPlayer = nil
         }
     }
 
     // MARK: - Selection
 
     func select(_ azanId: String) {
-        guard isDownloaded(azanId) else { return }
+        guard isAvailable(azanId) else { return }
         selectedAzanId = azanId
     }
 
     var selectedOption: AzanOption? {
         AzanOption.all.first { $0.id == selectedAzanId }
+    }
+}
+
+// MARK: - AVAudioPlayerDelegate
+
+extension AzanService: AVAudioPlayerDelegate {
+    nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        Task { @MainActor in
+            guard self.audioPlayer === player else { return }
+            self.audioPlayer = nil
+            self.isPlaying = false
+            self.onFinishPlaying?()
+        }
     }
 }

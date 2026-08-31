@@ -26,5 +26,7 @@
     <string>Noor needs your location to calculate accurate prayer times for your area.</string>
     <key>NSLocationUsageDescription</key>
     <string>Noor needs your location to calculate accurate prayer times for your area.</string>
+    <key>ATSApplicationFontsPath</key>
+    <string>.</string>
 </dict>
 </plist>

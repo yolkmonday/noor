@@ -26,9 +26,60 @@
 		VIW001 /* NoorPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC008; };
 		VIW002 /* PrayerRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC009; };
 		VIW003 /* PrayerHeroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC010; };
+		VIW004 /* CityPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC022; };
+		VIW005 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC023; };
+		VIW006 /* AzanPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC024; };
+		VIW007 /* PrayerChecklistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC025; };
+		VIW008 /* StatsBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC026; };
+		VIW009 /* StatsCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC027; };
+		VIW010 /* WeeklyCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC028; };
+		VIW011 /* AzanAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC029; };
+		VIW012 /* JadwalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC030; };
+		VIW013 /* SolatkuTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC031; };
 
-		/* Adhan Library */
-		ADH001 /* Adhan Sources in Sources */ = {isa = PBXBuildFile; fileRef = GRP_ADHAN; };
+		/* Additional Models */
+		MOD003 /* AzanOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC011; };
+		MOD004 /* City.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC012; };
+		MOD005 /* CoreDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC013; };
+
+		/* Additional Services */
+		SVC004 /* AzanService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC014; };
+		SVC005 /* HijriCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC015; };
+		SVC006 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC016; };
+		SVC007 /* PrayerLogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC017; };
+		SVC008 /* StatsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC018; };
+		SVC009 /* AzanAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC019; };
+
+		/* Theme */
+		THM001 /* NoorColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC020; };
+
+		/* Additional ViewModels */
+		VMD002 /* SolatkuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRC021; };
+
+		/* Adhan Package */
+		ADH001 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = PKGPROD001; };
+
+		/* Additional Resources */
+		RESFILE001 /* cities.json in Resources */ = {isa = PBXBuildFile; fileRef = RES_CITIES; };
+		RESFILE002 /* AppIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = RES_APPICON; };
+		RESFILE003 /* AppIconTransparent.png in Resources */ = {isa = PBXBuildFile; fileRef = RES_APPICON_T; };
+
+		/* Outfit Fonts */
+		FNT001 /* Outfit_400Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = RES_FONT001; };
+		FNT002 /* Outfit_600SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = RES_FONT002; };
+		FNT003 /* Outfit_700Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = RES_FONT003; };
+
+		/* Azan Sounds */
+		AZN001 /* azan_makkah.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN001; };
+		AZN002 /* azan_mishary.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN002; };
+		AZN003 /* azan_abdul_basit.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN003; };
+		AZN004 /* azan_ahmad_nafees.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN004; };
+		AZN005 /* azan_subuh.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN005; };
+		AZN006 /* azan_malaysia.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN006; };
+		AZN007 /* azan_turkey.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN007; };
+		AZN008 /* azan_pakistan.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN008; };
+		AZN009 /* azan_bosnia.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN009; };
+		AZN010 /* azan_egypt.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = RES_AZN010; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,9 +96,52 @@
 		SRC008 /* NoorPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoorPanelView.swift; sourceTree = "<group>"; };
 		SRC009 /* PrayerRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerRowView.swift; sourceTree = "<group>"; };
 		SRC010 /* PrayerHeroCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerHeroCard.swift; sourceTree = "<group>"; };
+		SRC011 /* AzanOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AzanOption.swift; sourceTree = "<group>"; };
+		SRC012 /* City.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = City.swift; sourceTree = "<group>"; };
+		SRC013 /* CoreDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModels.swift; sourceTree = "<group>"; };
+		SRC014 /* AzanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AzanService.swift; sourceTree = "<group>"; };
+		SRC015 /* HijriCalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HijriCalendarService.swift; sourceTree = "<group>"; };
+		SRC016 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		SRC017 /* PrayerLogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerLogService.swift; sourceTree = "<group>"; };
+		SRC018 /* StatsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsService.swift; sourceTree = "<group>"; };
+		SRC019 /* AzanAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AzanAlertWindowController.swift; sourceTree = "<group>"; };
+		SRC020 /* NoorColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoorColors.swift; sourceTree = "<group>"; };
+		SRC021 /* SolatkuViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolatkuViewModel.swift; sourceTree = "<group>"; };
+		SRC022 /* CityPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityPickerView.swift; sourceTree = "<group>"; };
+		SRC023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		SRC024 /* AzanPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AzanPickerView.swift; sourceTree = "<group>"; };
+		SRC025 /* PrayerChecklistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerChecklistView.swift; sourceTree = "<group>"; };
+		SRC026 /* StatsBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsBarView.swift; sourceTree = "<group>"; };
+		SRC027 /* StatsCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsCardView.swift; sourceTree = "<group>"; };
+		SRC028 /* WeeklyCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyCalendarView.swift; sourceTree = "<group>"; };
+		SRC029 /* AzanAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AzanAlertView.swift; sourceTree = "<group>"; };
+		SRC030 /* JadwalTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JadwalTab.swift; sourceTree = "<group>"; };
+		SRC031 /* SolatkuTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolatkuTab.swift; sourceTree = "<group>"; };
 
 		CFG001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CFG002 /* Noor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Noor.entitlements; sourceTree = "<group>"; };
+
+		/* Other Resources */
+		RES_CITIES /* cities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cities.json; sourceTree = "<group>"; };
+		RES_APPICON /* AppIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AppIcon.png; sourceTree = "<group>"; };
+		RES_APPICON_T /* AppIconTransparent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AppIconTransparent.png; sourceTree = "<group>"; };
+
+		/* Outfit Font Resources */
+		RES_FONT001 /* Outfit_400Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Outfit_400Regular.ttf; sourceTree = "<group>"; };
+		RES_FONT002 /* Outfit_600SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Outfit_600SemiBold.ttf; sourceTree = "<group>"; };
+		RES_FONT003 /* Outfit_700Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Outfit_700Bold.ttf; sourceTree = "<group>"; };
+
+		/* Azan Sound Resources */
+		RES_AZN001 /* azan_makkah.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_makkah.mp3; sourceTree = "<group>"; };
+		RES_AZN002 /* azan_mishary.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_mishary.mp3; sourceTree = "<group>"; };
+		RES_AZN003 /* azan_abdul_basit.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_abdul_basit.mp3; sourceTree = "<group>"; };
+		RES_AZN004 /* azan_ahmad_nafees.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_ahmad_nafees.mp3; sourceTree = "<group>"; };
+		RES_AZN005 /* azan_subuh.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_subuh.mp3; sourceTree = "<group>"; };
+		RES_AZN006 /* azan_malaysia.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_malaysia.mp3; sourceTree = "<group>"; };
+		RES_AZN007 /* azan_turkey.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_turkey.mp3; sourceTree = "<group>"; };
+		RES_AZN008 /* azan_pakistan.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_pakistan.mp3; sourceTree = "<group>"; };
+		RES_AZN009 /* azan_bosnia.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_bosnia.mp3; sourceTree = "<group>"; };
+		RES_AZN010 /* azan_egypt.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = azan_egypt.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +149,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADH001 /* Adhan in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,7 +160,6 @@
 			isa = PBXGroup;
 			children = (
 				GRP_NOOR /* Noor */,
-				GRP_ADHAN /* adhan-swift */,
 				GRP_PRODUCTS /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,6 +178,7 @@
 				SRC001 /* NoorApp.swift */,
 				GRP_MODELS /* Models */,
 				GRP_SERVICES /* Services */,
+				GRP_THEME /* Theme */,
 				GRP_VIEWMODELS /* ViewModels */,
 				GRP_VIEWS /* Views */,
 				GRP_RESOURCES /* Resources */,
@@ -98,6 +193,9 @@
 			children = (
 				SRC002 /* PrayerName.swift */,
 				SRC003 /* AppSettings.swift */,
+				SRC011 /* AzanOption.swift */,
+				SRC012 /* City.swift */,
+				SRC013 /* CoreDataModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -108,14 +206,29 @@
 				SRC004 /* AdhanService.swift */,
 				SRC005 /* LocationService.swift */,
 				SRC006 /* NotificationService.swift */,
+				SRC014 /* AzanService.swift */,
+				SRC015 /* HijriCalendarService.swift */,
+				SRC016 /* PersistenceController.swift */,
+				SRC017 /* PrayerLogService.swift */,
+				SRC018 /* StatsService.swift */,
+				SRC019 /* AzanAlertWindowController.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		GRP_THEME /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				SRC020 /* NoorColors.swift */,
+			);
+			path = Theme;
 			sourceTree = "<group>";
 		};
 		GRP_VIEWMODELS /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
 				SRC007 /* PrayerTimeViewModel.swift */,
+				SRC021 /* SolatkuViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -126,22 +239,73 @@
 				SRC008 /* NoorPanelView.swift */,
 				SRC009 /* PrayerRowView.swift */,
 				SRC010 /* PrayerHeroCard.swift */,
+				SRC022 /* CityPickerView.swift */,
+				SRC023 /* SettingsView.swift */,
+				GRP_COMPONENTS /* Components */,
+				GRP_TABS /* Tabs */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		GRP_COMPONENTS /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				SRC024 /* AzanPickerView.swift */,
+				SRC025 /* PrayerChecklistView.swift */,
+				SRC026 /* StatsBarView.swift */,
+				SRC027 /* StatsCardView.swift */,
+				SRC028 /* WeeklyCalendarView.swift */,
+				SRC029 /* AzanAlertView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		GRP_TABS /* Tabs */ = {
+			isa = PBXGroup;
+			children = (
+				SRC030 /* JadwalTab.swift */,
+				SRC031 /* SolatkuTab.swift */,
+			);
+			path = Tabs;
 			sourceTree = "<group>";
 		};
 		GRP_RESOURCES /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				GRP_AZAN /* Azan */,
+				GRP_FONTS /* Fonts */,
+				RES_CITIES /* cities.json */,
+				RES_APPICON /* AppIcon.png */,
+				RES_APPICON_T /* AppIconTransparent.png */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		GRP_ADHAN /* adhan-swift */ = {
+		GRP_FONTS /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				RES_FONT001 /* Outfit_400Regular.ttf */,
+				RES_FONT002 /* Outfit_600SemiBold.ttf */,
+				RES_FONT003 /* Outfit_700Bold.ttf */,
 			);
-			path = "adhan-swift/Sources";
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		GRP_AZAN /* Azan */ = {
+			isa = PBXGroup;
+			children = (
+				RES_AZN001 /* azan_makkah.mp3 */,
+				RES_AZN002 /* azan_mishary.mp3 */,
+				RES_AZN003 /* azan_abdul_basit.mp3 */,
+				RES_AZN004 /* azan_ahmad_nafees.mp3 */,
+				RES_AZN005 /* azan_subuh.mp3 */,
+				RES_AZN006 /* azan_malaysia.mp3 */,
+				RES_AZN007 /* azan_turkey.mp3 */,
+				RES_AZN008 /* azan_pakistan.mp3 */,
+				RES_AZN009 /* azan_bosnia.mp3 */,
+				RES_AZN010 /* azan_egypt.mp3 */,
+			);
+			path = Azan;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -160,6 +324,9 @@
 			dependencies = (
 			);
 			name = Noor;
+			packageProductDependencies = (
+				PKGPROD001 /* Adhan */,
+			);
 			productName = Noor;
 			productReference = PRD001 /* Noor.app */;
 			productType = "com.apple.product-type.application";
@@ -183,6 +350,9 @@
 				Base,
 			);
 			mainGroup = GRP_ROOT;
+			packageReferences = (
+				PKGREF001 /* XCLocalSwiftPackageReference "adhan-swift" */,
+			);
 			productRefGroup = GRP_PRODUCTS /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -192,11 +362,41 @@
 		};
 /* End PBXProject section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		PKGREF001 /* XCLocalSwiftPackageReference "adhan-swift" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "adhan-swift";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		PKGPROD001 /* Adhan */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Adhan;
+		};
+/* End XCSwiftPackageProductDependency section */
+
 /* Begin PBXResourcesBuildPhase section */
 		RES001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				RESFILE001 /* cities.json in Resources */,
+				RESFILE002 /* AppIcon.png in Resources */,
+				RESFILE003 /* AppIconTransparent.png in Resources */,
+				FNT001 /* Outfit_400Regular.ttf in Resources */,
+				FNT002 /* Outfit_600SemiBold.ttf in Resources */,
+				FNT003 /* Outfit_700Bold.ttf in Resources */,
+				AZN001 /* azan_makkah.mp3 in Resources */,
+				AZN002 /* azan_mishary.mp3 in Resources */,
+				AZN003 /* azan_abdul_basit.mp3 in Resources */,
+				AZN004 /* azan_ahmad_nafees.mp3 in Resources */,
+				AZN005 /* azan_subuh.mp3 in Resources */,
+				AZN006 /* azan_malaysia.mp3 in Resources */,
+				AZN007 /* azan_turkey.mp3 in Resources */,
+				AZN008 /* azan_pakistan.mp3 in Resources */,
+				AZN009 /* azan_bosnia.mp3 in Resources */,
+				AZN010 /* azan_egypt.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,6 +417,27 @@
 				VIW001 /* NoorPanelView.swift in Sources */,
 				VIW002 /* PrayerRowView.swift in Sources */,
 				VIW003 /* PrayerHeroCard.swift in Sources */,
+				MOD003 /* AzanOption.swift in Sources */,
+				MOD004 /* City.swift in Sources */,
+				MOD005 /* CoreDataModels.swift in Sources */,
+				SVC004 /* AzanService.swift in Sources */,
+				SVC005 /* HijriCalendarService.swift in Sources */,
+				SVC006 /* PersistenceController.swift in Sources */,
+				SVC007 /* PrayerLogService.swift in Sources */,
+				SVC008 /* StatsService.swift in Sources */,
+				SVC009 /* AzanAlertWindowController.swift in Sources */,
+				THM001 /* NoorColors.swift in Sources */,
+				VMD002 /* SolatkuViewModel.swift in Sources */,
+				VIW004 /* CityPickerView.swift in Sources */,
+				VIW005 /* SettingsView.swift in Sources */,
+				VIW006 /* AzanPickerView.swift in Sources */,
+				VIW007 /* PrayerChecklistView.swift in Sources */,
+				VIW008 /* StatsBarView.swift in Sources */,
+				VIW009 /* StatsCardView.swift in Sources */,
+				VIW010 /* WeeklyCalendarView.swift in Sources */,
+				VIW011 /* AzanAlertView.swift in Sources */,
+				VIW012 /* JadwalTab.swift in Sources */,
+				VIW013 /* SolatkuTab.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

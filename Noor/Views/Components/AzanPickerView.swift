@@ -42,22 +42,11 @@ struct AzanPickerView: View {
                         AzanOptionRow(
                             option: option,
                             isSelected: azanService.selectedAzanId == option.id,
-                            downloadState: azanService.downloadStates[option.id] ?? .notDownloaded,
                             onSelect: {
-                                if azanService.isDownloaded(option.id) {
-                                    azanService.select(option.id)
-                                }
-                            },
-                            onDownload: {
-                                Task {
-                                    await azanService.download(option)
-                                }
+                                azanService.select(option.id)
                             },
                             onPreview: {
                                 azanService.preview(option.id)
-                            },
-                            onDelete: {
-                                azanService.deleteDownload(option.id)
                             }
                         )
                     }
@@ -74,11 +63,8 @@ struct AzanPickerView: View {
 struct AzanOptionRow: View {
     let option: AzanOption
     let isSelected: Bool
-    let downloadState: AzanDownloadState
     let onSelect: () -> Void
-    let onDownload: () -> Void
     let onPreview: () -> Void
-    let onDelete: () -> Void
 
     var body: some View {
         HStack {
@@ -93,44 +79,6 @@ struct AzanOptionRow: View {
 
             Spacer()
 
-            actionButton
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 10)
-        .background(isSelected ? Color.noorTeal.opacity(0.08) : Color.clear)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            if case .downloaded = downloadState {
-                onSelect()
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var actionButton: some View {
-        switch downloadState {
-        case .notDownloaded:
-            Button(action: onDownload) {
-                HStack(spacing: 4) {
-                    Image(systemName: "arrow.down.circle")
-                        .font(.system(size: 14))
-                    Text(option.fileSize)
-                        .font(.caption)
-                }
-                .foregroundStyle(Color.noorTeal)
-            }
-            .buttonStyle(.plain)
-
-        case .downloading(let progress):
-            HStack(spacing: 6) {
-                ProgressView()
-                    .scaleEffect(0.6)
-                Text("\(Int(progress * 100))%")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-        case .downloaded:
             HStack(spacing: 8) {
                 if !option.isSilent {
                     Button(action: onPreview) {
@@ -139,31 +87,19 @@ struct AzanOptionRow: View {
                             .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
-
-                    Button(action: onDelete) {
-                        Image(systemName: "trash")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.red.opacity(0.8))
-                    }
-                    .buttonStyle(.plain)
                 }
 
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 18))
                     .foregroundStyle(isSelected ? Color.noorTeal : .secondary.opacity(0.3))
             }
-
-        case .failed:
-            Button(action: onDownload) {
-                HStack(spacing: 4) {
-                    Image(systemName: "exclamationmark.circle")
-                        .foregroundStyle(.red)
-                    Text("Retry")
-                        .font(.caption)
-                        .foregroundStyle(Color.noorTeal)
-                }
-            }
-            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 10)
+        .background(isSelected ? Color.noorTeal.opacity(0.08) : Color.clear)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onSelect()
         }
     }
 }

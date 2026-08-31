@@ -1,6 +1,5 @@
 import Foundation
 import UserNotifications
-import AVFoundation
 import os.log
 
 final class NotificationService {
@@ -9,7 +8,6 @@ final class NotificationService {
     private static let logger = Logger(subsystem: "com.noor.app", category: "NotificationService")
 
     private let center = UNUserNotificationCenter.current()
-    private var audioPlayer: AVAudioPlayer?
 
     @Published var reminderEnabled: Bool {
         didSet {
@@ -55,7 +53,7 @@ final class NotificationService {
         let shouldPlayAzan: Bool
         if playAzan {
             let azanService = AzanService.shared
-            shouldPlayAzan = azanService.selectedAzanId != "silent" && azanService.isDownloaded(azanService.selectedAzanId)
+            shouldPlayAzan = azanService.selectedAzanId != "silent" && azanService.isAvailable(azanService.selectedAzanId)
         } else {
             shouldPlayAzan = false
         }
@@ -66,7 +64,8 @@ final class NotificationService {
             title: "Waktu \(prayer) Telah Tiba",
             body: "Saatnya menunaikan solat \(prayer)",
             date: time,
-            playAzan: shouldPlayAzan
+            playAzan: shouldPlayAzan,
+            prayer: prayer
         )
 
         // Reminder before prayer time (if enabled)
@@ -89,15 +88,16 @@ final class NotificationService {
         title: String,
         body: String,
         date: Date,
-        playAzan: Bool = false
+        playAzan: Bool = false,
+        prayer: String = ""
     ) {
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
 
-        // Store whether to play azan in userInfo
-        content.userInfo = ["playAzan": playAzan]
+        // Store whether to play azan (and which prayer, for the popup) in userInfo
+        content.userInfo = ["playAzan": playAzan, "prayer": prayer]
 
         let components = Calendar.current.dateComponents(
             [.year, .month, .day, .hour, .minute, .second],
@@ -121,12 +121,11 @@ final class NotificationService {
         }
     }
 
-    /// Play azan sound (called when notification is received)
+    /// Play azan sound and show the azan popup (called when notification is received)
     @MainActor
-    func playAzanIfNeeded() {
-        let azanService = AzanService.shared
-        guard azanService.azanEnabled && azanService.selectedAzanId != "silent" else { return }
-        azanService.play()
+    func playAzanIfNeeded(prayer: String) {
+        AzanService.shared.play()
+        AzanAlertWindowController.shared.show(prayerName: prayer)
     }
 
     /// Remove all pending notifications
@@ -155,8 +154,9 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
 
         // Play azan if needed
         if let playAzan = notification.request.content.userInfo["playAzan"] as? Bool, playAzan {
+            let prayer = notification.request.content.userInfo["prayer"] as? String ?? ""
             Task { @MainActor in
-                NotificationService.shared.playAzanIfNeeded()
+                NotificationService.shared.playAzanIfNeeded(prayer: prayer)
             }
         }
     }

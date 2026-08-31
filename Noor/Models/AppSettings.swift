@@ -113,10 +113,6 @@ final class AppSettings: ObservableObject {
         didSet { save() }
     }
 
-    @Published var enableAdhanSound: Bool {
-        didSet { save() }
-    }
-
     @Published var launchAtLogin: Bool {
         didSet {
             save()
@@ -169,8 +165,6 @@ final class AppSettings: ObservableObject {
         let savedMinutes = defaults.integer(forKey: "notificationMinutesBefore")
         self.notificationMinutesBefore = savedMinutes == 0 ? 15 : savedMinutes
 
-        self.enableAdhanSound = defaults.bool(forKey: "enableAdhanSound")
-
         self.launchAtLogin = defaults.bool(forKey: "launchAtLogin")
 
         self.showNotificationBefore = defaults.object(forKey: "showNotificationBefore") as? Bool ?? true
@@ -202,7 +196,6 @@ final class AppSettings: ObservableObject {
         defaults.set(countdownFormat.rawValue, forKey: "countdownFormat")
         defaults.set(prayerNameFormat.rawValue, forKey: "prayerNameFormat")
         defaults.set(notificationMinutesBefore, forKey: "notificationMinutesBefore")
-        defaults.set(enableAdhanSound, forKey: "enableAdhanSound")
         defaults.set(launchAtLogin, forKey: "launchAtLogin")
         defaults.set(showNotificationBefore, forKey: "showNotificationBefore")
         defaults.set(reminderMinutesBefore, forKey: "reminderMinutesBefore")
