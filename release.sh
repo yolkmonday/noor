@@ -8,6 +8,8 @@ SIGN_IDENTITY="${SIGN_IDENTITY:-Developer ID Application: Ari Padrian (K4TMF53N3
 #   xcrun notarytool store-credentials notary --apple-id <id> --team-id K4TMF53N3L --password <app-specific>
 NOTARY_PROFILE="${NOTARY_PROFILE:-notary}"
 
+source "$(dirname "$0")/scripts/sparkle-bundle.sh"
+
 echo "Building release..."
 swift build -c release
 
@@ -21,13 +23,18 @@ cp -r build/Noor.app dist/
 # Copy release binary
 cp .build/release/Noor dist/Noor.app/Contents/MacOS/Noor
 
+# Embed Sparkle (auto updater)
+sparkle_embed dist/Noor.app .build/release
+
 # Stamp version into the bundle (build/Noor.app is gitignored, so it can drift)
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" -c "Set :CFBundleVersion $VERSION" dist/Noor.app/Contents/Info.plist
 
 # Copy resources
 cp Noor/Resources/cities.json dist/Noor.app/Contents/Resources/ 2>/dev/null || true
 
-# Sign with Developer ID + hardened runtime (required for notarization)
+# Sign with Developer ID + hardened runtime (required for notarization).
+# Nested Sparkle code first, then the app.
+sparkle_sign dist/Noor.app "$SIGN_IDENTITY"
 codesign --force --options runtime --timestamp \
   --sign "$SIGN_IDENTITY" --entitlements Noor.entitlements dist/Noor.app
 codesign --verify --deep --strict dist/Noor.app
