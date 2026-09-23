@@ -84,8 +84,23 @@ cd dist
 ditto -c -k --keepParent Noor.app "${APP_NAME}-${VERSION}.zip"
 cd ..
 
+echo "Generating appcast..."
+APPCAST_STAGING="$(mktemp -d)"
+cp "dist/${APP_NAME}-${VERSION}.zip" "$APPCAST_STAGING/"
+# Release notes shown in Sparkle's dialog, if present (same basename as the archive)
+if [ -f "release-notes/${VERSION}.html" ]; then
+  cp "release-notes/${VERSION}.html" "$APPCAST_STAGING/${APP_NAME}-${VERSION}.html"
+fi
+# Signs the ZIP with the EdDSA key from the login Keychain
+"$SPARKLE_BIN/generate_appcast" \
+  --download-url-prefix "https://github.com/yolkmonday/noor/releases/download/v${VERSION}/" \
+  --embed-release-notes \
+  -o dist/appcast.xml \
+  "$APPCAST_STAGING"
+rm -rf "$APPCAST_STAGING"
+
 echo "Calculating SHA256..."
-shasum -a 256 dist/*.dmg dist/*.zip
+shasum -a 256 dist/*.dmg dist/*.zip dist/appcast.xml
 
 echo "Done! Files in dist/"
 ls -la dist/
