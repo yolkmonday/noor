@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
+cd "$(dirname "$0")"
 
-VERSION="1.2.3"
+# Single source of truth for the version: Noor/Info.plist (run.sh reads it too)
+VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" Noor/Info.plist)
 APP_NAME="Noor"
 SIGN_IDENTITY="${SIGN_IDENTITY:-Developer ID Application: Ari Padrian (K4TMF53N3L)}"
 # Notary credentials live in the keychain, created once with:
