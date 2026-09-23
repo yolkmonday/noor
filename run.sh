@@ -20,6 +20,8 @@ sparkle_stamp_plist build/Noor.app \
 cp Noor/Resources/cities.json build/Noor.app/Contents/Resources/ 2>/dev/null || true
 # Azan sounds (AzanService looks them up by id, e.g. azan_makkah.mp3)
 cp azan/*.mp3 build/Noor.app/Contents/Resources/
+# Outfit fonts (Info.plist ATSApplicationFontsPath = ".")
+cp Noor/Resources/Fonts/*.ttf build/Noor.app/Contents/Resources/
 
 echo "Signing with entitlements..."
 sparkle_sign build/Noor.app -

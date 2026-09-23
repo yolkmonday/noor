@@ -168,7 +168,7 @@ struct DayCell: View {
 
                 ZStack {
                     Circle()
-                        .fill(isSelected ? Color.noorTeal : Color.clear)
+                        .fill(isSelected ? Color.noorTealDeep : Color.clear)
                         .frame(width: 26, height: 26)
 
                     if isToday && !isSelected {

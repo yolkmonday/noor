@@ -1,9 +1,20 @@
 import SwiftUI
+import AppKit
 
 // Noor Brand Colors - shared with the noor-expo mobile app's theme
 extension Color {
-    // Primary brand color - deep forest green (Colors.theme.primary in noor-expo)
-    static let noorTeal = Color(red: 0x22 / 255, green: 0x57 / 255, blue: 0x51 / 255)
+    // Primary brand color - deep forest green (Colors.theme.primary in noor-expo).
+    // Fixed: use where the surface is always light or text on it is white.
+    static let noorTealDeep = Color(red: 0x22 / 255, green: 0x57 / 255, blue: 0x51 / 255)
+
+    // Brand accent for text/icons on system surfaces. The deep green is unreadable on
+    // the dark panel, so dark mode gets a lighter teal (~5.5:1 on the panel).
+    static let noorTeal = Color(nsColor: NSColor(name: nil) { appearance in
+        let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        return isDark
+            ? NSColor(red: 0x4F / 255, green: 0xB3 / 255, blue: 0x9A / 255, alpha: 1)
+            : NSColor(red: 0x22 / 255, green: 0x57 / 255, blue: 0x51 / 255, alpha: 1)
+    })
 
     // Yellow accent from logo - bright yellow with slight green tint
     static let noorYellow = Color(red: 0.94, green: 0.94, blue: 0.48)
