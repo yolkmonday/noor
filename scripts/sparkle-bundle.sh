@@ -29,3 +29,19 @@ sparkle_sign() {
   codesign "${opts[@]}" "$fw/Versions/B/Updater.app"
   codesign "${opts[@]}" "$fw"
 }
+
+# Write Sparkle's Info.plist keys into the bundle (build/Noor.app is gitignored,
+# so the bundle template can't be the source of truth).
+sparkle_stamp_plist() {
+  local app="$1" feed_url="$2" public_key="$3"
+  local plist="$app/Contents/Info.plist"
+  local pb=/usr/libexec/PlistBuddy
+  for key in SUFeedURL SUPublicEDKey SUEnableAutomaticChecks SUScheduledCheckInterval; do
+    $pb -c "Delete :$key" "$plist" 2>/dev/null || true
+  done
+  $pb -c "Add :SUFeedURL string $feed_url" \
+      -c "Add :SUPublicEDKey string $public_key" \
+      -c "Add :SUEnableAutomaticChecks bool true" \
+      -c "Add :SUScheduledCheckInterval integer 86400" \
+      "$plist"
+}

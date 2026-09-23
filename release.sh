@@ -7,6 +7,9 @@ SIGN_IDENTITY="${SIGN_IDENTITY:-Developer ID Application: Ari Padrian (K4TMF53N3
 # Notary credentials live in the keychain, created once with:
 #   xcrun notarytool store-credentials notary --apple-id <id> --team-id K4TMF53N3L --password <app-specific>
 NOTARY_PROFILE="${NOTARY_PROFILE:-notary}"
+# Sparkle EdDSA public key (private key: login Keychain + ~/.apple-signing backup)
+SPARKLE_PUBLIC_KEY="LBjgYuTgmzTSgbE0hJNg4qdwI+0lNblnGDyGdDBvo44="
+FEED_URL="${FEED_URL:-https://github.com/yolkmonday/noor/releases/latest/download/appcast.xml}"
 
 source "$(dirname "$0")/scripts/sparkle-bundle.sh"
 
@@ -28,6 +31,7 @@ sparkle_embed dist/Noor.app .build/release
 
 # Stamp version into the bundle (build/Noor.app is gitignored, so it can drift)
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" -c "Set :CFBundleVersion $VERSION" dist/Noor.app/Contents/Info.plist
+sparkle_stamp_plist dist/Noor.app "$FEED_URL" "$SPARKLE_PUBLIC_KEY"
 
 # Copy resources
 cp Noor/Resources/cities.json dist/Noor.app/Contents/Resources/ 2>/dev/null || true
