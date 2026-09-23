@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-VERSION="1.2.2"
+VERSION="1.2.3"
 APP_NAME="Noor"
 SIGN_IDENTITY="${SIGN_IDENTITY:-Developer ID Application: Ari Padrian (K4TMF53N3L)}"
 # Notary credentials live in the keychain, created once with:
