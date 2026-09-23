@@ -18,6 +18,8 @@ VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" Noor/In
 sparkle_stamp_plist build/Noor.app \
   "https://github.com/yolkmonday/noor/releases/latest/download/appcast.xml" "LBjgYuTgmzTSgbE0hJNg4qdwI+0lNblnGDyGdDBvo44="
 cp Noor/Resources/cities.json build/Noor.app/Contents/Resources/ 2>/dev/null || true
+# Azan sounds (AzanService looks them up by id, e.g. azan_makkah.mp3)
+cp azan/*.mp3 build/Noor.app/Contents/Resources/
 
 echo "Signing with entitlements..."
 sparkle_sign build/Noor.app -

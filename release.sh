@@ -35,6 +35,8 @@ sparkle_stamp_plist dist/Noor.app "$FEED_URL" "$SPARKLE_PUBLIC_KEY"
 
 # Copy resources
 cp Noor/Resources/cities.json dist/Noor.app/Contents/Resources/ 2>/dev/null || true
+# Azan sounds (AzanService looks them up by id, e.g. azan_makkah.mp3)
+cp azan/*.mp3 dist/Noor.app/Contents/Resources/
 
 # Sign with Developer ID + hardened runtime (required for notarization).
 # Nested Sparkle code first, then the app.
