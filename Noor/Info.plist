@@ -26,6 +26,14 @@
     <string>Noor needs your location to calculate accurate prayer times for your area.</string>
     <key>NSLocationUsageDescription</key>
     <string>Noor needs your location to calculate accurate prayer times for your area.</string>
+    <key>SUFeedURL</key>
+    <string>https://github.com/yolkmonday/noor/releases/latest/download/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>LBjgYuTgmzTSgbE0hJNg4qdwI+0lNblnGDyGdDBvo44=</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUScheduledCheckInterval</key>
+    <integer>86400</integer>
     <key>ATSApplicationFontsPath</key>
     <string>.</string>
 </dict>

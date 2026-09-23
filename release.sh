@@ -7,6 +7,11 @@ SIGN_IDENTITY="${SIGN_IDENTITY:-Developer ID Application: Ari Padrian (K4TMF53N3
 # Notary credentials live in the keychain, created once with:
 #   xcrun notarytool store-credentials notary --apple-id <id> --team-id K4TMF53N3L --password <app-specific>
 NOTARY_PROFILE="${NOTARY_PROFILE:-notary}"
+# Sparkle EdDSA public key (private key: login Keychain + ~/.apple-signing backup)
+SPARKLE_PUBLIC_KEY="LBjgYuTgmzTSgbE0hJNg4qdwI+0lNblnGDyGdDBvo44="
+FEED_URL="${FEED_URL:-https://github.com/yolkmonday/noor/releases/latest/download/appcast.xml}"
+
+source "$(dirname "$0")/scripts/sparkle-bundle.sh"
 
 echo "Building release..."
 swift build -c release
@@ -21,13 +26,23 @@ cp -r build/Noor.app dist/
 # Copy release binary
 cp .build/release/Noor dist/Noor.app/Contents/MacOS/Noor
 
+# Embed Sparkle (auto updater)
+sparkle_embed dist/Noor.app .build/release
+
 # Stamp version into the bundle (build/Noor.app is gitignored, so it can drift)
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" -c "Set :CFBundleVersion $VERSION" dist/Noor.app/Contents/Info.plist
+sparkle_stamp_plist dist/Noor.app "$FEED_URL" "$SPARKLE_PUBLIC_KEY"
 
 # Copy resources
 cp Noor/Resources/cities.json dist/Noor.app/Contents/Resources/ 2>/dev/null || true
+# Azan sounds (AzanService looks them up by id, e.g. azan_makkah.mp3)
+cp azan/*.mp3 dist/Noor.app/Contents/Resources/
+# Outfit fonts (Info.plist ATSApplicationFontsPath = ".")
+cp Noor/Resources/Fonts/*.ttf dist/Noor.app/Contents/Resources/
 
-# Sign with Developer ID + hardened runtime (required for notarization)
+# Sign with Developer ID + hardened runtime (required for notarization).
+# Nested Sparkle code first, then the app.
+sparkle_sign dist/Noor.app "$SIGN_IDENTITY"
 codesign --force --options runtime --timestamp \
   --sign "$SIGN_IDENTITY" --entitlements Noor.entitlements dist/Noor.app
 codesign --verify --deep --strict dist/Noor.app
@@ -73,8 +88,23 @@ cd dist
 ditto -c -k --keepParent Noor.app "${APP_NAME}-${VERSION}.zip"
 cd ..
 
+echo "Generating appcast..."
+APPCAST_STAGING="$(mktemp -d)"
+cp "dist/${APP_NAME}-${VERSION}.zip" "$APPCAST_STAGING/"
+# Release notes shown in Sparkle's dialog, if present (same basename as the archive)
+if [ -f "release-notes/${VERSION}.html" ]; then
+  cp "release-notes/${VERSION}.html" "$APPCAST_STAGING/${APP_NAME}-${VERSION}.html"
+fi
+# Signs the ZIP with the EdDSA key from the login Keychain
+"$SPARKLE_BIN/generate_appcast" \
+  --download-url-prefix "https://github.com/yolkmonday/noor/releases/download/v${VERSION}/" \
+  --embed-release-notes \
+  -o dist/appcast.xml \
+  "$APPCAST_STAGING"
+rm -rf "$APPCAST_STAGING"
+
 echo "Calculating SHA256..."
-shasum -a 256 dist/*.dmg dist/*.zip
+shasum -a 256 dist/*.dmg dist/*.zip dist/appcast.xml
 
 echo "Done! Files in dist/"
 ls -la dist/

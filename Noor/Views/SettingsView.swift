@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject var viewModel: PrayerTimeViewModel
     @ObservedObject private var settings = AppSettings.shared
     @ObservedObject private var locationService = LocationService.shared
+    @ObservedObject private var updater = UpdaterService.shared
 
     var body: some View {
         VStack(spacing: 0) {
@@ -289,6 +290,40 @@ struct SettingsView: View {
                         .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 6))
                     }
 
+                    // MARK: - Pembaruan
+                    SettingsSection(title: "Pembaruan") {
+                        VStack(spacing: 1) {
+                            SettingsToggleRow(
+                                icon: "arrow.triangle.2.circlepath",
+                                title: "Periksa pembaruan otomatis",
+                                subtitle: "Cek versi baru sekali sehari",
+                                isOn: Binding(
+                                    get: { updater.automaticallyChecksForUpdates },
+                                    set: { updater.automaticallyChecksForUpdates = $0 }
+                                )
+                            )
+
+                            Button {
+                                updater.checkForUpdates()
+                            } label: {
+                                HStack {
+                                    Image(systemName: "arrow.down.circle")
+                                        .font(.system(size: 14))
+                                        .foregroundStyle(.secondary)
+                                        .frame(width: 24)
+                                    Text("Periksa Pembaruan…")
+                                        .font(.subheadline)
+                                    Spacer()
+                                }
+                                .padding(10)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!updater.canCheckForUpdates)
+                        }
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                    }
+
                     // MARK: - Tentang
                     SettingsSection(title: "Tentang") {
                         VStack(spacing: 1) {
@@ -303,7 +338,7 @@ struct SettingsView: View {
 
                                 Spacer()
 
-                                Text("1.0.0")
+                                Text(UpdaterService.currentVersion)
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }

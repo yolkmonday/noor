@@ -56,7 +56,7 @@ private struct AzanAlertCard: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .foregroundStyle(.white)
-                    .background(Color.noorTeal, in: RoundedRectangle(cornerRadius: 16))
+                    .background(Color.noorTealDeep, in: RoundedRectangle(cornerRadius: 16))
             }
             .buttonStyle(PressableButtonStyle())
         }
@@ -66,7 +66,7 @@ private struct AzanAlertCard: View {
             LinearGradient(colors: Color.noorGradient, startPoint: .top, endPoint: .bottom),
             in: RoundedRectangle(cornerRadius: 28)
         )
-        .shadow(color: Color.noorTeal.opacity(0.35), radius: 40, y: 16)
+        .shadow(color: Color.noorTealDeep.opacity(0.35), radius: 40, y: 16)
     }
 
     private var iconBadge: some View {
@@ -77,7 +77,7 @@ private struct AzanAlertCard: View {
 
             Image(systemName: "bell.and.waves.left.and.right")
                 .font(.system(size: 46, weight: .medium))
-                .foregroundStyle(Color.noorTeal)
+                .foregroundStyle(Color.noorTealDeep)
                 .symbolEffect(.pulse, options: .repeating)
         }
     }

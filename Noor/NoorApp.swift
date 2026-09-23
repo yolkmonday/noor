@@ -8,6 +8,8 @@ struct NoorApp: App {
     init() {
         // Set notification delegate for azan playback
         UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+        // Start Sparkle so scheduled update checks run from launch
+        _ = UpdaterService.shared
     }
 
     var body: some Scene {
